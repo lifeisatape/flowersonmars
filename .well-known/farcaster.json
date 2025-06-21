@@ -16,11 +16,11 @@
     "splashBackgroundColor": "#951212",
     "subtitle": "Epic space shooter adventure",
     "description": "Battle hordes of wobbling aliens on Mars with incredible particle effects and original soundtrack.",
-    "primaryCategory": "game",
+    "primaryCategory": "games",
     "tags": ["game", "shooter", "space", "mars", "action"],
     "heroImageUrl": "https://flowersonmars.space/generated-icon.png",
     "tagline": "Battle. Survive. Conquer.",
-    "ogTitle": "Flowers on Mars - Epic Space Shooter",
+    "ogTitle": "Flowers on Mars",
     "ogDescription": "Battle hordes of wobbling aliens on Mars with incredible particle effects and original soundtrack",
     "ogImageUrl": "https://flowersonmars.space/generated-icon.png"
   }
