@@ -105,11 +105,11 @@ class Player extends GameObject {
 
         // Система текстовых сообщений при уроне
         this.damageTexts = [];
-        this.damageTextMessages = ['ouch', 'oh', 'ow', 'ugh'];
+        this.damageTextMessages = ['ouch', 'oh', 'wowow', 'ugh', 'devs do sth'];
 
         // Система текстовых сообщений при убийстве врагов
         this.killTexts = [];
-        this.killTextMessages = ['frag', 'boom', 'rekt', 'owned'];
+        this.killTextMessages = ['lol', 'boom', 'rekt', 'own3d', 'warped', 'bye', 'done'];
 
         this.resetFeetToStartPosition();
 
