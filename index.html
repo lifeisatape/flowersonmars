@@ -9,21 +9,21 @@
     <!-- Farcaster Mini App Meta Tags -->
     <meta property="fc:frame" content='{
       "version":"next",
-      "imageUrl":"https://bdc0bb95-7bdd-46ec-9da0-52e4603ee00d-00-3ej960ie6pa9z.pike.replit.dev/generated-icon.png",
+      "imageUrl":"https://flowersonmars.space/generated-icon.png",
       "button":{
         "title":"🚀 Play Game",
         "action":{
           "type":"launch_frame",
           "name":"Flowers on Mars",
-          "url":"https://bdc0bb95-7bdd-46ec-9da0-52e4603ee00d-00-3ej960ie6pa9z.pike.replit.dev/?miniApp=true",
-          "splashImageUrl":"https://bdc0bb95-7bdd-46ec-9da0-52e4603ee00d-00-3ej960ie6pa9z.pike.replit.dev/generated-icon.png",
+          "url":"https://flowersonmars.space/?miniApp=true",
+          "splashImageUrl":"https://flowersonmars.space/generated-icon.png",
           "splashBackgroundColor":"#951212"
         }
       }
     }' />
     <meta property="og:title" content="Flowers on Mars" />
     <meta property="og:description" content="An epic space shooter where you battle hordes of wobbling aliens on Mars with incredible particle effects and original soundtrack." />
-    <meta property="og:image" content="https://bdc0bb95-7bdd-46ec-9da0-52e4603ee00d-00-3ej960ie6pa9z.pike.replit.dev/generated-icon.png" />
+    <meta property="og:image" content="hhttps://flowersonmars.space/generated-icon.png" />
     <link rel="stylesheet" href="styles/main.css">
     <link rel="stylesheet" href="styles/landing.css">
 </head>
@@ -75,7 +75,6 @@
         Your browser does not support the audio element.
     </audio>
 
-    <!-- Scripts -->
     <script src="scripts/ShooterConfig.js"></script>
     <script src="scripts/Camera.js"></script>
     <script src="scripts/MarsTerrainRenderer.js"></script>
@@ -111,10 +110,7 @@
     <script src="scripts/LevelManager.js"></script>
     <script src="scripts/SpawnManager.js"></script>
     <script src="scripts/ShooterGame.js"></script>
-
-    <!-- Mini App Detection -->
     <script>
-        // Упрощенная детекция Mini App
         window.isMiniApp = window.parent !== window || 
                           window.location.search.includes('miniApp=true') ||
                           navigator.userAgent.includes('Warpcast') ||
@@ -122,8 +118,6 @@
 
         console.log(window.isMiniApp ? '🚀 Running in Farcaster Mini App mode' : '🌐 Running in regular web mode');
     </script>
-
-    <!-- Farcaster SDK -->
     <script type="module">
         if (window.isMiniApp) {
             console.log('📦 Loading Farcaster SDK...');
@@ -131,8 +125,6 @@
                 const { sdk } = await import('https://esm.sh/@farcaster/frame-sdk');
                 window.sdk = sdk;
                 console.log('✅ Farcaster SDK loaded successfully');
-                
-                // Дожидаемся готовности DOM и инициализируем
                 if (document.readyState === 'loading') {
                     document.addEventListener('DOMContentLoaded', () => {
                         if (window.farcasterIntegration) {
