@@ -1,0 +1,25 @@
+
+/* Стили для чекбокса привязки к сетке */
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    margin: 10px 0;
+    cursor: pointer;
+    font-size: 14px;
+    color: #e2e8f0;
+}
+
+.checkbox-container input[type="checkbox"] {
+    margin-right: 8px;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+.checkbox-container:hover {
+    color: #f7fafc;
+}
+
+.checkmark {
+    margin-left: 4px;
+}
