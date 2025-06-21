@@ -65,7 +65,7 @@ class DroneHelper extends GameObject {
 
     updateShooting(deltaTime) {
         if (this.shootCooldown > 0) {
-            this.shootCooldown -= deltaTime * 1000;
+            this.shootCooldown -= 1;
         }
     }
 
