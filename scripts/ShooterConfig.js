@@ -44,9 +44,8 @@ const ShooterConfig = {
   ENEMY_SHADOW_SIZE_RATIO: 2.5 , // Новый параметр: размер тени относительно размера врага
   ENEMY_SHADOW_OFFSET_Y_RATIO: 1 , // Новый параметр: вертикальное смещение тени относительно размера врага
 
-  // Новые настройки для управления врагами
-  ENEMIES_PER_LEVEL: 20,
-  INITIAL_ENEMIES: 5,
+  ENEMIES_PER_LEVEL: 100,
+  INITIAL_ENEMIES: 2,
   MAX_ACTIVE_ENEMIES: 20,
   ENEMY_SPAWN_DELAY: 10000,
 
