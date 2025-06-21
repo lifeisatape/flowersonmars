@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Level Editor - Flowers on Mars</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: #2c1810;
+            color: #fff;
+            overflow: hidden;
+        }
+
+        .editor-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .toolbar {
+            width: 250px;
+            background: #1a0f08;
+            padding: 20px;
+            overflow-y: auto;
+            border-right: 2px solid #4a2817;
+        }
+
+        .canvas-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #editorCanvas {
+            cursor: crosshair;
+            background: #951212;
+        }
+
+        .tool-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #2c1810;
+            border-radius: 8px;
+            border: 1px solid #4a2817;
+        }
+
+        .tool-section h3 {
+            margin: 0 0 10px 0;
+            color: #ff6b35;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+
+        .tool-button {
+            display: block;
+            width: 100%;
+            padding: 8px 12px;
+            margin: 5px 0;
+            background: #4a2817;
+            border: none;
+            border-radius: 4px;
+            color: #fff;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.3s;
+        }
+
+        .tool-button:hover {
+            background: #6b3625;
+        }
+
+        .tool-button.active {
+            background: #ff6b35;
+            color: #000;
+        }
+
+        .size-slider {
+            width: 100%;
+            margin: 10px 0;
+        }
+
+        .size-display {
+            text-align: center;
+            font-size: 12px;
+            color: #ccc;
+        }
+
+        .controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 100;
+        }
+
+        .control-btn {
+            padding: 10px 15px;
+            margin: 0 5px;
+            background: #4a2817;
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .control-btn:hover {
+            background: #6b3625;
+        }
+
+        .minimap {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            width: 200px;
+            height: 200px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #ff6b35;
+            border-radius: 5px;
+        }
+
+        .info-panel {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            color: #ccc;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 5px;
+            margin: 5px 0;
+            background: #2c1810;
+            border: 1px solid #4a2817;
+            border-radius: 3px;
+            color: #fff;
+            font-size: 12px;
+        }
+
+        .file-operations {
+            margin-top: 10px;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .enemy-type-select {
+            width: 100%;
+            padding: 5px;
+            margin: 5px 0;
+            background: #2c1810;
+            border: 1px solid #4a2817;
+            border-radius: 3px;
+            color: #fff;
+            font-size: 12px;
+        }
+
+        /* Стили для чекбокса */
+        .checkbox-container {
+            display: block;
+            position: relative;
+            padding-left: 30px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            font-size: 14px;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            color: #fff;
+        }
+
+        /* Скрываем стандартный чекбокс */
+        .checkbox-container input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+
+        /* Создаем свой собственный чекбокс */
+        .checkmark {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 20px;
+            width: 20px;
+            background-color: #4a2817;
+            border-radius: 3px;
+        }
+
+        /* При наведении */
+        .checkbox-container:hover input ~ .checkmark {
+            background-color: #6b3625;
+        }
+
+        /* Когда чекбокс отмечен */
+        .checkbox-container input:checked ~ .checkmark {
+            background-color: #ff6b35;
+        }
+
+        /* Создаем индикатор (галочку) */
+        .checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+        }
+
+        /* Отображаем галочку, когда чекбокс отмечен */
+        .checkbox-container input:checked ~ .checkmark:after {
+            display: block;
+        }
+
+        /* Стилизуем галочку */
+        .checkbox-container .checkmark:after {
+            left: 7px;
+            top: 3px;
+            width: 5px;
+            height: 10px;
+            border: solid black;
+            border-width: 0 3px 3px 0;
+            -webkit-transform: rotate(45deg);
+            -ms-transform: rotate(45deg);
+            transform: rotate(45deg);
+        }
+    </style>
+</head>
+<body>
+    <div class="editor-container">
+        <div class="toolbar">
+            <div class="tool-section">
+                <h3>Инструменты</h3>
+                <button class="tool-button active" data-tool="select">Выбор</button>
+                <button class="tool-button" data-tool="room">Комната</button>
+                <button class="tool-button" data-tool="corridor">Коридор</button>
+                <button class="tool-button" data-tool="door">Дверь</button>
+                <button class="tool-button" data-tool="obstacle">Препятствие</button>
+                <button class="tool-button" data-tool="tree">Дерево</button>
+                <button class="tool-button" data-tool="enemy">Враг</button>
+                <button class="tool-button" data-tool="spawn">Спавн игрока</button>
+                <button class="tool-button" data-tool="erase">Стереть</button>
+            </div>
+
+            <div class="tool-section">
+                <h3>Размер объекта</h3>
+                <input type="range" class="size-slider" id="sizeSlider" min="20" max="200" value="50">
+                <div class="size-display" id="sizeDisplay">50px</div>
+
+                <h3>Привязка к сетке</h3>
+                <label class="checkbox-container">
+                    <input type="checkbox" id="snapToGrid" checked>
+                    <span class="checkmark"></span>
+                    Примагничивать к сетке
+                </label>
+            </div>
+
+            <div class="tool-section">
+                <h3>Тип комнаты</h3>
+                <select class="enemy-type-select" id="roomTypeSelect">
+                    <option value="small">Маленькая</option>
+                    <option value="medium">Средняя</option>
+                    <option value="large">Большая</option>
+                    <option value="boss">Босс</option>
+                </select>
+            </div>
+
+            <div class="tool-section">
+                <h3>Тип двери</h3>
+                <select class="enemy-type-select" id="doorTypeSelect">
+                    <option value="normal">Обычная</option>
+                    <option value="locked">Заперта</option>
+                    <option value="boss">Босс</option>
+                    <option value="secret">Секретная</option>
+                </select>
+            </div>
+
+            <div class="tool-section">
+                <h3>Тип врага</h3>
+                <select class="enemy-type-select" id="enemyTypeSelect">
+                    <option value="normal">Обычный</option>
+                    <option value="shooting">Стреляющий</option>
+                    <option value="charging">Атакующий</option>
+                    <option value="explosive">Взрывной</option>
+                    <option value="shield">Щитовик</option>
+                    <option value="sniper">Снайпер</option>
+                    <option value="teleporter">Телепорт</option>
+                    <option value="boss">Босс</option>
+                </select>
+            </div>
+
+            <div class="tool-section">
+                <h3>Файл</h3>
+                <input type="text" class="input-field" id="levelName" placeholder="Название уровня">
+                <div class="file-operations">
+                    <button class="tool-button" onclick="saveLevel()">Сохранить</button>
+                    <button class="tool-button" onclick="document.getElementById('fileInput').click()">Загрузить</button>
+                    <button class="tool-button" onclick="clearLevel()">Очистить</button>
+                    <button class="tool-button" onclick="exportLevel()">Экспорт JSON</button>
+                    <button class="tool-button" onclick="testLevel()">Тест уровня</button>
+                </div>
+                <input type="file" id="fileInput" class="file-input" accept=".json" onchange="loadLevel(event)">
+            </div>
+
+            <div class="tool-section">
+                <h3>Статистика</h3>
+                <div id="stats">
+                    <div>Комнат: <span id="roomCount">0</span></div>
+                    <div>Коридоров: <span id="corridorCount">0</span></div>
+                    <div>Дверей: <span id="doorCount">0</span></div>
+                    <div>Препятствий: <span id="obstacleCount">0</span></div>
+                    <div>Деревьев: <span id="treeCount">0</span></div>
+                    <div>Врагов: <span id="enemyCount">0</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="canvas-container">
+            <canvas id="editorCanvas"></canvas>
+            <div class="controls">
+                <button class="control-btn" onclick="zoomIn()">+</button>
+                <button class="control-btn" onclick="zoomOut()">-</button>
+                <button class="control-btn" onclick="resetView()">Сброс</button>
+            </div>
+            <canvas id="minimap" class="minimap"></canvas>
+            <div class="info-panel" id="infoPanel">
+                Позиция: (0, 0)<br>
+                Зум: 100%<br>
+                Инструмент: Выбор
+            </div>
+        </div>
+    </div>
+
+    <script src="scripts/ShooterConfig.js"></script>
+    <script src="scripts/LevelEditor.js"></script>
+</body>
+</html>
