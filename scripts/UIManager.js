@@ -211,7 +211,7 @@ class UIManager {
         if (isWon) {
             shareText = `🚀 I beat Flowers on Mars! Scored ${score} points and reached level ${level}! 🏆👽 Try to beat my record!`;
         } else {
-            shareText = `💥 I battled on Mars in Flowers on Mars! Scored ${score} points and reached level ${level}! 🚀👽 Can you do better?`;
+            shareText = `💥 I battled on Mars! Scored ${score} points and reached level ${level}! 🚀👽 Can you do better?`;
         }
 
         // Проверяем наличие Farcaster интеграции
