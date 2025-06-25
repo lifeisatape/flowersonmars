@@ -138,6 +138,33 @@ class FarcasterIntegration {
         }
         return null;
     }
+
+    // Метод для доната через sendToken
+    async sendDonation(amount = '1000000') { // По умолчанию 1 USDC
+        if (!this.isFarcasterApp || !this.sdk || !this.sdk.actions || !this.sdk.actions.sendToken) {
+            console.log('Farcaster SDK недоступен для доната');
+            return { success: false, reason: 'sdk_unavailable' };
+        }
+
+        try {
+            const result = await this.sdk.actions.sendToken({
+                token: 'eip155:8453/erc20:0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', // Base USDC
+                amount: amount, // 1 USDC = 1000000 (6 decimals)
+                recipientAddress: '0x7Ea45b01EECaE066f37500c92B10421937571f75'
+            });
+
+            if (result.success) {
+                console.log('Донат успешно отправлен:', result.send.transaction);
+                return result;
+            } else {
+                console.log('Ошибка при донате:', result.error);
+                return result;
+            }
+        } catch (error) {
+            console.error('Ошибка при отправке доната:', error);
+            return { success: false, reason: 'send_failed', error: error.message };
+        }
+    }
 }
 
 // Глобальная инициализация
