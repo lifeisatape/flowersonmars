@@ -333,6 +333,16 @@ body {
     box-shadow: 0 20px 40px rgba(255, 69, 0, 0.6);
 }
 
+/* Кнопка Donate */
+.donate-button {
+    background: linear-gradient(45deg, #32CD32, #00FF7F);
+    box-shadow: 0 10px 30px rgba(50, 205, 50, 0.4);
+}
+
+.donate-button:hover {
+    box-shadow: 0 20px 40px rgba(50, 205, 50, 0.6);
+}
+
 .button-text {
     letter-spacing: 3px;
     font-weight: 900;
