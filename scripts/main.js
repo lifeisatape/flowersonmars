@@ -1,4 +1,3 @@
-
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('DOM загружен, инициализация игры');
 
@@ -289,50 +288,68 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // Обработчик для кнопки Share
+    // Обработчик кнопки "Share"
     if (shareButton) {
         shareButton.addEventListener('click', async () => {
-            if (window.farcasterIntegration && window.farcasterIntegration.isInMiniApp && window.farcasterIntegration.sdk) {
-                try {
-                    await window.farcasterIntegration.sdk.actions.composeCast({
-                        text: "🚀 Just discovered Flowers on Mars! Epic space shooter with amazing particle effects! 👽💥",
-                        embeds: [window.location.origin]
-                    });
-
-                    // Временно изменяем текст кнопки
-                    const shareButton = document.getElementById('share-game');
-                    const originalText = shareButton.querySelector('.button-text').textContent;
-                    shareButton.querySelector('.button-text').textContent = 'SHARED!';
-                    setTimeout(() => {
-                        shareButton.querySelector('.button-text').textContent = originalText;
-                    }, 2000);
-                } catch (error) {
-                    console.error('Error sharing:', error);
-                    alert('Ошибка при попытке поделиться');
-                }
-            } else {
-                // Fallback для обычного браузера
-                const text = "🚀 Just discovered Flowers on Mars! Epic space shooter with amazing particle effects! 👽💥";
+            try {
+                const shareText = "🚀 Check out Flowers on Mars - an epic space shooter game! Battle aliens on Mars with incredible effects! 👽💥";
                 const url = window.location.href;
 
-                if (navigator.share) {
-                    try {
-                        await navigator.share({
-                            title: 'Flowers on Mars',
-                            text: text,
-                            url: url
-                        });
-                    } catch (error) {
-                        console.log('Share cancelled or failed:', error);
+                if (window.farcasterIntegration && window.farcasterIntegration.isInMiniApp && window.farcasterIntegration.sdk && window.farcasterIntegration.sdk.actions) {
+                    await window.farcasterIntegration.sdk.actions.composeCast({
+                        text: shareText,
+                        embeds: [url]
+                    });
+                    console.log('Game shared to Farcaster');
+                } else if (navigator.share) {
+                    await navigator.share({
+                        title: 'Flowers on Mars',
+                        text: shareText,
+                        url: url
+                    });
+                } else {
+                    // Fallback - copy to clipboard
+                    const fullText = `${shareText} ${url}`;
+                    if (navigator.clipboard) {
+                        await navigator.clipboard.writeText(fullText);
+                        console.log('Link copied to clipboard');
+                    }
+                }
+            } catch (error) {
+                console.log('Error sharing game:', error);
+            }
+        });
+    }
+
+    // Обработчик кнопки "Donate"
+    const donateButton = document.getElementById('donate-button');
+    if (donateButton) {
+        donateButton.addEventListener('click', async () => {
+            try {
+                if (window.farcasterIntegration && window.farcasterIntegration.isInMiniApp) {
+                    const result = await window.farcasterIntegration.sendDonation('1000000'); // 1 USDC
+                    if (result.success) {
+                        console.log('Donation successful!');
+                        // Можно добавить уведомление пользователю
+                    } else {
+                        console.log('Donation failed:', result.reason);
+                        // Fallback - показать адрес для ручного перевода
+                        alert('Please send USDC to: 0x7Ea45b01EECaE066f37500c92B10421937571f75');
                     }
                 } else {
-                    // Копируем в буфер обмена
-                    navigator.clipboard.writeText(`${text} ${url}`).then(() => {
-                        alert('Ссылка скопирована в буфер обмена!');
-                    }).catch(() => {
-                        alert('Не удалось скопировать ссылку');
-                    });
+                    // Fallback для не-Farcaster окружения
+                    const address = '0x7Ea45b01EECaE066f37500c92B10421937571f75';
+                    if (navigator.clipboard) {
+                        await navigator.clipboard.writeText(address);
+                        alert(`Wallet address copied to clipboard:\n${address}\n\nPlease send USDC (Base network)`);
+                    } else {
+                        alert(`Please send USDC to this address (Base network):\n${address}`);
+                    }
                 }
+            } catch (error) {
+                console.error('Error processing donation:', error);
+                // Fallback
+                alert('Please send USDC to: 0x7Ea45b01EECaE066f37500c92B10421937571f75');
             }
         });
     }
