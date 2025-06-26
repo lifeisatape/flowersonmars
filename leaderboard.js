@@ -1,4 +1,3 @@
-
 class FlowersOnMarsLeaderboard {
     constructor() {
         this.apiUrl = 'https://fomscore.replit.app';
@@ -21,20 +20,6 @@ class FlowersOnMarsLeaderboard {
             }
         }
         return null;
-    }
-
-    /**
-     * Update player name from Farcaster
-     */
-    updateFromFarcaster() {
-        const farcasterName = this.getFarcasterUsername();
-        if (farcasterName) {
-            this.playerName = farcasterName;
-            localStorage.setItem('playerName', farcasterName);
-            console.log(`Player name updated from Farcaster: ${farcasterName}`);
-            return true;
-        }
-        return false;
     }
 
     /**
@@ -72,7 +57,7 @@ class FlowersOnMarsLeaderboard {
             });
 
             const result = await response.json();
-            
+
             if (result.success) {
                 console.log(`Score submitted successfully: ${result.message}`);
                 this.showNotification(result.message, 'success');
@@ -80,7 +65,7 @@ class FlowersOnMarsLeaderboard {
                 // Update leaderboard display
                 await this.loadLeaderboard();
                 
-                // Show celebration if top-3
+                // Show celebration for top 3
                 if (result.newRank <= 3) {
                     this.showRankCelebration(result.newRank);
                 }
@@ -88,11 +73,11 @@ class FlowersOnMarsLeaderboard {
                 console.log(`Score not improved: ${result.message}`);
                 this.showNotification(result.message, 'info');
             }
-            
+
             return result;
         } catch (error) {
             console.error('Error submitting score:', error);
-            this.showNotification('Error submitting score. Check your connection.', 'error');
+            this.showNotification('Network error. Check connection.', 'error');
             return { success: false, message: 'Network error' };
         } finally {
             this.isSubmitting = false;
@@ -106,7 +91,7 @@ class FlowersOnMarsLeaderboard {
         try {
             const response = await fetch(`${this.apiUrl}/api/leaderboard`);
             const data = await response.json();
-            
+
             if (data.success) {
                 this.displayLeaderboard(data);
                 return data;
@@ -122,7 +107,7 @@ class FlowersOnMarsLeaderboard {
     }
 
     /**
-     * Get player statistics
+     * Get player stats
      */
     async getPlayerStats(playerName) {
         try {
@@ -174,7 +159,6 @@ class FlowersOnMarsLeaderboard {
                     <div class="rank">${rankIcon}</div>
                     <div class="player-info">
                         <div class="player-name">${player.playerName}</div>
-                        <div class="last-updated">${this.formatTimeAgo(player.lastUpdated)}</div>
                     </div>
                     <div class="score">${this.formatScore(player.bestScore)}</div>
                 </div>
@@ -186,7 +170,7 @@ class FlowersOnMarsLeaderboard {
     }
 
     /**
-     * Display current player statistics
+     * Display current player stats
      */
     async displayPlayerStats() {
         const stats = await this.getPlayerStats(this.playerName);
@@ -207,10 +191,6 @@ class FlowersOnMarsLeaderboard {
                         <span>Best Score:</span>
                         <span class="score-value">${this.formatScore(player.bestScore)}</span>
                     </div>
-                    <div class="stat-item">
-                        <span>Last Updated:</span>
-                        <span>${this.formatTimeAgo(player.lastUpdated)}</span>
-                    </div>
                 </div>
             `;
         } else {
@@ -223,24 +203,10 @@ class FlowersOnMarsLeaderboard {
     }
 
     /**
-     * Format numbers
+     * Format score numbers
      */
     formatScore(score) {
-        return score.toLocaleString('ru-RU');
-    }
-
-    /**
-     * Format time
-     */
-    formatTimeAgo(timestamp) {
-        const now = new Date();
-        const past = new Date(timestamp);
-        const diffInSeconds = Math.floor((now - past) / 1000);
-        
-        if (diffInSeconds < 60) return 'Just now';
-        if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} min ago`;
-        if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hrs ago`;
-        return `${Math.floor(diffInSeconds / 86400)} days ago`;
+        return score.toLocaleString('en-US');
     }
 
     /**
@@ -259,7 +225,7 @@ class FlowersOnMarsLeaderboard {
      * Show notification
      */
     showNotification(message, type = 'info') {
-        // Создать элемент уведомления
+        // Create notification element
         const notification = document.createElement('div');
         notification.className = `notification notification-${type}`;
         notification.innerHTML = `
@@ -269,13 +235,13 @@ class FlowersOnMarsLeaderboard {
             </div>
         `;
 
-        // Добавить в DOM
+        // Add to DOM
         document.body.appendChild(notification);
 
-        // Показать с анимацией
+        // Show with animation
         setTimeout(() => notification.classList.add('show'), 100);
 
-        // Убрать через 4 секунды
+        // Remove after 4 seconds
         setTimeout(() => {
             notification.classList.remove('show');
             setTimeout(() => document.body.removeChild(notification), 300);
@@ -307,7 +273,7 @@ class FlowersOnMarsLeaderboard {
                 icon = '🥈✨';
                 break;
             case 3:
-                message = 'Magnificent! You are in the top three!';
+                message = 'Great! You are in the top three!';
                 icon = '🥉⭐';
                 break;
         }
@@ -328,7 +294,7 @@ class FlowersOnMarsLeaderboard {
     }
 
     /**
-     * Automatic leaderboard refresh
+     * Auto refresh leaderboard
      */
     startAutoRefresh(intervalSeconds = 30) {
         console.log(`Starting auto-refresh every ${intervalSeconds} seconds`);
@@ -346,16 +312,10 @@ class FlowersOnMarsLeaderboard {
     }
 
     /**
-     * Show name input dialog (only for non-Farcaster users)
+     * Prompt for player name
      */
     promptPlayerName() {
-        // If user is in Farcaster, don't show dialog
-        if (window.farcasterIntegration && window.farcasterIntegration.isInMiniApp) {
-            console.log('Farcaster user detected, skipping name prompt');
-            return this.playerName;
-        }
-        
-        const name = prompt('Enter your name for the leaderboard:', this.playerName);
+        const name = prompt('Enter your name for leaderboard:', this.playerName);
         if (name && name.trim()) {
             this.setPlayerName(name.trim());
             return name.trim();
@@ -366,42 +326,3 @@ class FlowersOnMarsLeaderboard {
 
 // Global instance for use in game
 window.leaderboard = new FlowersOnMarsLeaderboard();
-
-// Global functions for leaderboard management
-window.showLeaderboard = function() {
-    const panel = document.getElementById('leaderboard-panel');
-    if (panel) {
-        panel.style.display = 'block';
-        
-        // Hide change name button for Farcaster users
-        const changeNameBtn = document.getElementById('change-name-btn');
-        if (changeNameBtn) {
-            if (window.farcasterIntegration && window.farcasterIntegration.isInMiniApp) {
-                changeNameBtn.style.display = 'none';
-            } else {
-                changeNameBtn.style.display = 'inline-block';
-            }
-        }
-        
-        leaderboard.loadLeaderboard();
-        leaderboard.displayPlayerStats();
-    }
-};
-
-window.hideLeaderboard = function() {
-    const panel = document.getElementById('leaderboard-panel');
-    if (panel) {
-        panel.style.display = 'none';
-    }
-};
-
-window.changePlayerName = function() {
-    // For Farcaster users, don't allow name changes
-    if (window.farcasterIntegration && window.farcasterIntegration.isInMiniApp) {
-        alert('Name is automatically taken from your Farcaster profile');
-        return;
-    }
-    
-    leaderboard.promptPlayerName();
-    leaderboard.displayPlayerStats();
-};
