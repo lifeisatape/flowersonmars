@@ -25,6 +25,7 @@
     <meta property="og:image" content="hhttps://flowersonmars.space/generated-icon.png" />
     <link rel="stylesheet" href="styles/main.css">
     <link rel="stylesheet" href="styles/landing.css">
+    <link rel="stylesheet" href="leaderboard.css">
 </head>
 <body>
     <div id="loading-screen">
@@ -59,6 +60,19 @@
                 <div id="skin-selection" style="display: none;"></div>
             </div>
         </section>
+    </div>
+
+    <!-- Leaderboard Button -->
+    <button id="show-leaderboard" onclick="showLeaderboard()" style="display: none;">🏆 leaderboard</button>
+
+    <!-- Leaderboard Panel -->
+    <div id="leaderboard-panel" style="display: none;">
+        <div id="leaderboard"></div>
+        <div id="player-stats"></div>
+        <div style="text-align: center; margin-top: 20px;">
+            <button onclick="hideLeaderboard()">close</button>
+            <button id="change-name-btn" onclick="changePlayerName()">change name</button>
+        </div>
     </div>
 
     <div id="game-container" style="display: none;">
@@ -148,6 +162,7 @@
     </script>
 
     <script src="scripts/FarcasterIntegration.js"></script>
+    <script src="leaderboard.js"></script>
     <script src="scripts/main.js"></script>
 </body>
 </html>
