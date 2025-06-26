@@ -152,11 +152,11 @@ class FlowersOnMarsLeaderboard {
 
         let html = `
             <div class="leaderboard-header">
-                <h3>🏆 Galactic Leaderboard</h3>
-                <p>Top Flowers on Mars Commanders</p>
+                <h3>LEADERBOARD</h3>
+                <p>top FOM commanders</p>
             </div>
             <div class="leaderboard-stats">
-                <span>Total players: ${data.totalPlayers}</span>
+                <span>total players: ${data.totalPlayers}</span>
             </div>
             <div class="leaderboard-list">
         `;
@@ -195,7 +195,7 @@ class FlowersOnMarsLeaderboard {
             const player = stats.player;
             container.innerHTML = `
                 <div class="player-stats">
-                    <h4>Your Statistics</h4>
+                    <h4>your stats</h4>
                     <div class="stat-item">
                         <span>Rank:</span>
                         <span class="rank-value">#${player.rank}</span>
@@ -209,7 +209,7 @@ class FlowersOnMarsLeaderboard {
         } else {
             container.innerHTML = `
                 <div class="player-stats">
-                    <p>Play the game to see your statistics!</p>
+                    <p>play the game to see your stats!</p>
                 </div>
             `;
         }
