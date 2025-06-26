@@ -23,6 +23,20 @@ class FlowersOnMarsLeaderboard {
     }
 
     /**
+     * Update player name from Farcaster
+     */
+    updateFromFarcaster() {
+        const farcasterName = this.getFarcasterUsername();
+        if (farcasterName) {
+            this.playerName = farcasterName;
+            localStorage.setItem('playerName', farcasterName);
+            console.log(`Player name updated from Farcaster: ${farcasterName}`);
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Set player name
      */
     setPlayerName(name) {
@@ -44,7 +58,7 @@ class FlowersOnMarsLeaderboard {
 
         try {
             console.log(`Submitting score: ${score} for player: ${nameToUse}`);
-            
+
             const response = await fetch(`${this.apiUrl}/api/score`, {
                 method: 'POST',
                 headers: {
@@ -61,11 +75,11 @@ class FlowersOnMarsLeaderboard {
             if (result.success) {
                 console.log(`Score submitted successfully: ${result.message}`);
                 this.showNotification(result.message, 'success');
-                
+
                 // Update leaderboard display
                 await this.loadLeaderboard();
-                
-                // Show celebration for top 3
+
+                // Show celebration if top-3
                 if (result.newRank <= 3) {
                     this.showRankCelebration(result.newRank);
                 }
@@ -77,7 +91,7 @@ class FlowersOnMarsLeaderboard {
             return result;
         } catch (error) {
             console.error('Error submitting score:', error);
-            this.showNotification('Network error. Check connection.', 'error');
+            this.showNotification('Error submitting score. Check your connection.', 'error');
             return { success: false, message: 'Network error' };
         } finally {
             this.isSubmitting = false;
@@ -107,17 +121,17 @@ class FlowersOnMarsLeaderboard {
     }
 
     /**
-     * Get player stats
+     * Get player statistics
      */
     async getPlayerStats(playerName) {
         try {
             const encodedName = encodeURIComponent(playerName);
             const response = await fetch(`${this.apiUrl}/api/player/${encodedName}`);
-            
+
             if (response.status === 404) {
                 return { success: false, message: 'Player not found' };
             }
-            
+
             const data = await response.json();
             return data;
         } catch (error) {
@@ -143,7 +157,6 @@ class FlowersOnMarsLeaderboard {
             </div>
             <div class="leaderboard-stats">
                 <span>Total players: ${data.totalPlayers}</span>
-                <span class="live-indicator">🟢 Live</span>
             </div>
             <div class="leaderboard-list">
         `;
@@ -153,7 +166,7 @@ class FlowersOnMarsLeaderboard {
             const rankIcon = this.getRankIcon(rank);
             const rankClass = rank <= 3 ? 'top-player' : '';
             const isCurrentPlayer = player.playerName === this.playerName ? 'current-player' : '';
-            
+
             html += `
                 <div class="player-row ${rankClass} ${isCurrentPlayer}">
                     <div class="rank">${rankIcon}</div>
@@ -170,12 +183,12 @@ class FlowersOnMarsLeaderboard {
     }
 
     /**
-     * Display current player stats
+     * Display current player statistics
      */
     async displayPlayerStats() {
         const stats = await this.getPlayerStats(this.playerName);
         const container = document.getElementById('player-stats');
-        
+
         if (!container) return;
 
         if (stats.success) {
@@ -203,10 +216,10 @@ class FlowersOnMarsLeaderboard {
     }
 
     /**
-     * Format score numbers
+     * Format numbers
      */
     formatScore(score) {
-        return score.toLocaleString('en-US');
+        return score.toLocaleString('ru-RU');
     }
 
     /**
@@ -225,7 +238,7 @@ class FlowersOnMarsLeaderboard {
      * Show notification
      */
     showNotification(message, type = 'info') {
-        // Create notification element
+        // Создать элемент уведомления
         const notification = document.createElement('div');
         notification.className = `notification notification-${type}`;
         notification.innerHTML = `
@@ -235,13 +248,13 @@ class FlowersOnMarsLeaderboard {
             </div>
         `;
 
-        // Add to DOM
+        // Добавить в DOM
         document.body.appendChild(notification);
 
-        // Show with animation
+        // Показать с анимацией
         setTimeout(() => notification.classList.add('show'), 100);
 
-        // Remove after 4 seconds
+        // Убрать через 4 секунды
         setTimeout(() => {
             notification.classList.remove('show');
             setTimeout(() => document.body.removeChild(notification), 300);
@@ -262,7 +275,7 @@ class FlowersOnMarsLeaderboard {
      */
     showRankCelebration(rank) {
         let message, icon;
-        
+
         switch (rank) {
             case 1:
                 message = 'Congratulations! You are the galactic leader!';
@@ -273,7 +286,7 @@ class FlowersOnMarsLeaderboard {
                 icon = '🥈✨';
                 break;
             case 3:
-                message = 'Great! You are in the top three!';
+                message = 'Magnificent! You are in the top three!';
                 icon = '🥉⭐';
                 break;
         }
@@ -289,16 +302,16 @@ class FlowersOnMarsLeaderboard {
                 <button onclick="this.parentElement.parentElement.remove()">Continue</button>
             </div>
         `;
-        
+
         document.body.appendChild(modal);
     }
 
     /**
-     * Auto refresh leaderboard
+     * Automatic leaderboard refresh
      */
     startAutoRefresh(intervalSeconds = 30) {
         console.log(`Starting auto-refresh every ${intervalSeconds} seconds`);
-        
+
         this.refreshInterval = setInterval(() => {
             this.loadLeaderboard();
         }, intervalSeconds * 1000);
@@ -312,10 +325,16 @@ class FlowersOnMarsLeaderboard {
     }
 
     /**
-     * Prompt for player name
+     * Show name input dialog (only for non-Farcaster users)
      */
     promptPlayerName() {
-        const name = prompt('Enter your name for leaderboard:', this.playerName);
+        // If user is in Farcaster, don't show dialog
+        if (window.farcasterIntegration && window.farcasterIntegration.isInMiniApp) {
+            console.log('Farcaster user detected, skipping name prompt');
+            return this.playerName;
+        }
+
+        const name = prompt('Enter your name for the leaderboard:', this.playerName);
         if (name && name.trim()) {
             this.setPlayerName(name.trim());
             return name.trim();
@@ -326,3 +345,42 @@ class FlowersOnMarsLeaderboard {
 
 // Global instance for use in game
 window.leaderboard = new FlowersOnMarsLeaderboard();
+
+// Global functions for leaderboard management
+window.showLeaderboard = function() {
+    const panel = document.getElementById('leaderboard-panel');
+    if (panel) {
+        panel.style.display = 'block';
+
+        // Hide change name button for Farcaster users
+        const changeNameBtn = document.getElementById('change-name-btn');
+        if (changeNameBtn) {
+            if (window.farcasterIntegration && window.farcasterIntegration.isInMiniApp) {
+                changeNameBtn.style.display = 'none';
+            } else {
+                changeNameBtn.style.display = 'inline-block';
+            }
+        }
+
+        leaderboard.loadLeaderboard();
+        leaderboard.displayPlayerStats();
+    }
+};
+
+window.hideLeaderboard = function() {
+    const panel = document.getElementById('leaderboard-panel');
+    if (panel) {
+        panel.style.display = 'none';
+    }
+};
+
+window.changePlayerName = function() {
+    // For Farcaster users, don't allow name changes
+    if (window.farcasterIntegration && window.farcasterIntegration.isInMiniApp) {
+        alert('Name is automatically taken from your Farcaster profile');
+        return;
+    }
+
+    leaderboard.promptPlayerName();
+    leaderboard.displayPlayerStats();
+};
