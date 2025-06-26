@@ -94,6 +94,28 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     showMainContent();
 
+    // Initialize leaderboard
+    if (window.leaderboard) {
+        // Show leaderboard button
+        const leaderboardButton = document.getElementById('show-leaderboard');
+        if (leaderboardButton) {
+            leaderboardButton.style.display = 'block';
+        }
+        
+        // Initialize leaderboard system
+        // For Farcaster users, try to update name from Farcaster
+        setTimeout(() => {
+            if (window.farcasterIntegration && window.farcasterIntegration.isInMiniApp) {
+                leaderboard.updateFromFarcaster();
+            } else {
+                leaderboard.promptPlayerName();
+            }
+        }, 1000); // Give time for Farcaster to initialize
+        
+        leaderboard.loadLeaderboard();
+        leaderboard.startAutoRefresh(30);
+    }
+
     gameContainer.addEventListener('touchmove', function(e) {
         e.preventDefault();
     }, { passive: false });
