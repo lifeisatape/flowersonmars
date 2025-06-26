@@ -4,6 +4,7 @@ class UIManager {
         this.context = canvas.getContext('2d');
         this.game = game;
         this.buttonArea = { x: 0, y: 0, width: 0, height: 0 };
+        this.scoreSubmitted = false;
     }
 
     drawUI() {
@@ -70,6 +71,16 @@ class UIManager {
     }
 
     drawEndScreen(message, buttonText) {
+        // Submit score to leaderboard when showing end screen
+        if (window.leaderboard && this.game.score > 0 && 
+            (this.game.stateManager.currentState === 'gameOver' || this.game.stateManager.currentState === 'gameWon')) {
+            // Only submit once per game session
+            if (!this.scoreSubmitted) {
+                window.leaderboard.submitScore(this.game.score);
+                this.scoreSubmitted = true;
+            }
+        }
+
         // Простой тёмный градиентный фон как на лендинге
         const gradient = this.context.createLinearGradient(0, 0, 0, this.canvas.height);
         gradient.addColorStop(0, 'rgba(26, 0, 0, 0.95)');
@@ -102,6 +113,7 @@ class UIManager {
         // Добавляем кнопку Share для экранов окончания игры
         if (this.game.stateManager.currentState === 'gameOver' || this.game.stateManager.currentState === 'gameWon') {
             this.drawShareButton();
+            this.drawLeaderboardButton();
         }
 
         // Сброс выравнивания текста
@@ -174,6 +186,38 @@ class UIManager {
         this.context.fillText('📤 SHARE', this.shareButtonArea.x + this.shareButtonArea.width / 2, this.shareButtonArea.y + this.shareButtonArea.height / 2 + 6);
     }
 
+    drawLeaderboardButton() {
+        this.leaderboardButtonArea = {
+            x: this.canvas.width / 2 - 120,
+            y: this.canvas.height / 2 + 200,
+            width: 240,
+            height: 50
+        };
+
+        // Градиент для кнопки Leaderboard
+        const leaderboardGradient = this.context.createLinearGradient(
+            this.leaderboardButtonArea.x, this.leaderboardButtonArea.y,
+            this.leaderboardButtonArea.x, this.leaderboardButtonArea.y + this.leaderboardButtonArea.height
+        );
+        leaderboardGradient.addColorStop(0, '#ffd700');
+        leaderboardGradient.addColorStop(1, '#ffb347');
+
+        // Основа кнопки
+        this.context.fillStyle = leaderboardGradient;
+        this.context.fillRect(this.leaderboardButtonArea.x, this.leaderboardButtonArea.y, this.leaderboardButtonArea.width, this.leaderboardButtonArea.height);
+
+        // Простая рамка
+        this.context.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+        this.context.lineWidth = 1;
+        this.context.strokeRect(this.leaderboardButtonArea.x, this.leaderboardButtonArea.y, this.leaderboardButtonArea.width, this.leaderboardButtonArea.height);
+
+        // Текст кнопки
+        this.context.fillStyle = 'black';
+        this.context.font = 'bold 20px Arial';
+        this.context.textAlign = 'center';
+        this.context.fillText('🏆 LEADERBOARD', this.leaderboardButtonArea.x + this.leaderboardButtonArea.width / 2, this.leaderboardButtonArea.y + this.leaderboardButtonArea.height / 2 + 6);
+    }
+
     handleClick(x, y) {
         // Проверка клика по основной кнопке
         if (x >= this.buttonArea.x && x <= this.buttonArea.x + this.buttonArea.width &&
@@ -184,6 +228,7 @@ class UIManager {
                     break;
                 case 'gameOver':
                 case 'gameWon':
+                    this.scoreSubmitted = false; // Reset for new game
                     this.game.resetGame();
                     this.game.start();
                     break;
@@ -200,6 +245,16 @@ class UIManager {
             y >= this.shareButtonArea.y && y <= this.shareButtonArea.y + this.shareButtonArea.height) {
             this.shareGameResult();
         }
+
+        // Проверка клика по кнопке Leaderboard (только на экранах окончания игры)
+        if (this.leaderboardButtonArea && 
+            (this.game.stateManager.currentState === 'gameOver' || this.game.stateManager.currentState === 'gameWon') &&
+            x >= this.leaderboardButtonArea.x && x <= this.leaderboardButtonArea.x + this.leaderboardButtonArea.width &&
+            y >= this.leaderboardButtonArea.y && y <= this.leaderboardButtonArea.y + this.leaderboardButtonArea.height) {
+            if (window.showLeaderboard) {
+                window.showLeaderboard();
+            }
+        }
     }
 
     async shareGameResult() {
@@ -212,6 +267,11 @@ class UIManager {
             shareText = `🚀 I beat Flowers on Mars! Scored ${score} points and reached level ${level}! 🏆👽 Try to beat my record!`;
         } else {
             shareText = `💥 I battled on Mars! Scored ${score} points and reached level ${level}! 🚀👽 Can you do better?`;
+        }
+
+        // Submit score to leaderboard first
+        if (window.leaderboard && score > 0) {
+            await window.leaderboard.submitScore(score);
         }
 
         // Проверяем наличие Farcaster интеграции
