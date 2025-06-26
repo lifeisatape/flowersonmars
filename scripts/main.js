@@ -153,10 +153,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         function updatePlayerMovement() {
             let dx = 0, dy = 0;
-            if (keys['ArrowUp'] || keys['w']) dy -= 1;
-            if (keys['ArrowDown'] || keys['s']) dy += 1;
-            if (keys['ArrowLeft'] || keys['a']) dx -= 1;
-            if (keys['ArrowRight'] || keys['d']) dx += 1;
+            if (keys['ArrowUp'] || keys['w'] || keys['W']) dy -= 1;
+            if (keys['ArrowDown'] || keys['s'] || keys['S']) dy += 1;
+            if (keys['ArrowLeft'] || keys['a'] || keys['A']) dx -= 1;
+            if (keys['ArrowRight'] || keys['d'] || keys['D']) dx += 1;
 
             if (dx !== 0 && dy !== 0) {
                 const length = Math.sqrt(dx * dx + dy * dy);
